@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Wallet, CheckCircle2, XCircle, MessageCircle } from 'lucide-react';
-import { fetchOwnBilling } from '@/lib/dataAccess';
+import { fetchOwnBilling, subscribeToTable } from '@/lib/dataAccess';
 import { SENSEI_WHATSAPP, APP_NAME } from '@/data/appData';
 import { useAuth } from '@/context/AuthContext';
 import type { BillingRecord } from '@/types';
@@ -16,7 +16,12 @@ export default function TagihanSaya({ onBack }: TagihanSayaProps) {
 
   useEffect(() => {
     if (!student) return;
-    fetchOwnBilling(student.name).then(setBilling).catch(() => {}).finally(() => setLoading(false));
+    function load() {
+      fetchOwnBilling(student.name).then(setBilling).catch(() => {}).finally(() => setLoading(false));
+    }
+    load();
+    const unsub = subscribeToTable('billing', load);
+    return () => { unsub(); };
   }, [student]);
 
   const lunasCount = billing.filter((b) => b.status === 'lunas').length;

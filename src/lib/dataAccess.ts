@@ -73,10 +73,11 @@ function reviewRowToQuestion(row: RawReviewRow): QuizQuestion {
   };
 }
 
-export async function fetchQuizQuestions(moduleId: string): Promise<QuizQuestion[]> {
+export async function fetchQuizQuestions(moduleId: string, classLevel: 'N3' | 'N4' = 'N3'): Promise<QuizQuestion[]> {
+  const table = classLevel === 'N4' ? 'quiz_questions_n4' : 'quiz_questions_n3';
   const { data, error } = await supabase
-    .from('quiz_questions')
-    .select('*')
+    .from(table)
+    .select('id, module_id, mondai_id, question_number, question, option_a, option_b, option_c, option_d, correct_option, audio_url, created_at')
     .eq('module_id', moduleId)
     .order('question_number');
   if (error) throw error;
@@ -85,10 +86,11 @@ export async function fetchQuizQuestions(moduleId: string): Promise<QuizQuestion
   return shuffled.map(rowToQuestion);
 }
 
-export async function fetchReviewQuestions(categoryId: string, partNumber: number): Promise<QuizQuestion[]> {
+export async function fetchReviewQuestions(categoryId: string, partNumber: number, classLevel: 'N3' | 'N4' = 'N3'): Promise<QuizQuestion[]> {
+  const table = classLevel === 'N4' ? 'review_question_n4' : 'review_question_n3';
   const { data, error } = await supabase
-    .from('review_questions')
-    .select('*')
+    .from(table)
+    .select('id, category_id, part_number, question_number, question, option_a, option_b, option_c, option_d, correct_option, created_at')
     .eq('category_id', categoryId)
     .eq('part_number', partNumber)
     .order('question_number');
@@ -226,11 +228,11 @@ export async function fetchAllProfiles(): Promise<Student[]> {
 }
 
 export function subscribeToTable(
-  table: 'profiles' | 'quiz_questions' | 'review_questions' | 'student_progress' | 'billing' | 'schedule_sessions',
+  table: 'profiles' | 'quiz_questions_n3' | 'quiz_questions_n4' | 'review_question_n3' | 'review_question_n4' | 'student_progress' | 'billing' | 'schedule_sessions',
   callback: () => void,
 ): () => void {
   const channel = supabase
-    .channel(`realtime-${table}`)
+    .channel(`realtime-${table}-${Math.random().toString(36).slice(2, 8)}`)
     .on('postgres_changes', { event: '*', schema: 'public', table }, () => callback())
     .subscribe();
 

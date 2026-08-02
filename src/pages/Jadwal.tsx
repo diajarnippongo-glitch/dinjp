@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, CalendarDays, Clock, CheckCircle2, ExternalLink, BookOpen } from 'lucide-react';
-import { fetchSchedule } from '@/lib/dataAccess';
+import { fetchSchedule, subscribeToTable } from '@/lib/dataAccess';
 import { APP_NAME } from '@/data/appData';
 import type { ScheduleSession } from '@/types';
 
@@ -25,7 +25,12 @@ export default function Jadwal({ onBack }: JadwalProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSchedule().then(setSessions).catch(() => {}).finally(() => setLoading(false));
+    function load() {
+      fetchSchedule().then(setSessions).catch(() => {}).finally(() => setLoading(false));
+    }
+    load();
+    const unsub = subscribeToTable('schedule_sessions', load);
+    return () => { unsub(); };
   }, []);
 
   return (

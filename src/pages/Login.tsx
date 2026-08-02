@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Lock, Mail, Loader2, AlertCircle } from 'lucide-react';
+import { Lock, Mail, Loader2, AlertCircle, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { APP_NAME } from '@/data/appData';
+import { APP_NAME, SENSEI_WHATSAPP } from '@/data/appData';
 import Logo from '@/components/Logo';
 
 export default function Login() {
@@ -88,6 +88,16 @@ export default function Login() {
               {loading ? 'Memproses...' : 'Masuk'}
             </button>
           </form>
+
+          <a
+            href={`https://wa.me/${SENSEI_WHATSAPP}?text=Halo%20Sensei%2C%20saya%20lupa%20password%20akun%20saya.%20Mohon%20bantuan%20reset%20password.`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-5 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-green-700/50 bg-green-950/40 hover:bg-green-900/40 text-green-300 text-sm font-medium transition group"
+          >
+            <MessageCircle className="w-4 h-4 group-hover:scale-110 transition" />
+            Lupa Password? Hubungi Sensei via WhatsApp
+          </a>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import type { LearningModule, ReviewPondasiModule, QuizPartConfig } from '@/type
 
 export const APP_NAME = 'Portal Belajar DiN Japanese';
 export const SENSEI_EMAIL = 'sensei@din.com';
-export const SENSEI_WHATSAPP = '6281234567890';
+export const SENSEI_WHATSAPP = '6281312380029';
 export const DRIVE_LINK = 'https://drive.google.com/drive/folders/d/example-folder-id';
 
 export const modules: LearningModule[] = [

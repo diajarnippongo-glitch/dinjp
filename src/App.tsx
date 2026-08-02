@@ -14,7 +14,7 @@ import BurgerMenu, { type MenuView } from '@/components/BurgerMenu';
 import type { ModuleId, QuizQuestion, ReviewPondasiId, ProgressRecord, TimerConfig } from '@/types';
 import { REVIEW_TIMER, QUIZ_TIMERS } from '@/types';
 import { modules, reviewPondasiModules, quizParts } from '@/data/appData';
-import { fetchQuizQuestions, fetchReviewQuestions, fetchStudentProgress, saveProgress } from '@/lib/dataAccess';
+import { fetchQuizQuestions, fetchReviewQuestions, fetchStudentProgress, saveProgress, subscribeToTable } from '@/lib/dataAccess';
 
 type View =
   | { name: 'dashboard' }
@@ -31,7 +31,12 @@ function AppContent() {
 
   useEffect(() => {
     if (student && student.role === 'student') {
-      fetchStudentProgress(student.id).then(setProgress).catch(() => {});
+      function load() {
+        fetchStudentProgress(student.id).then(setProgress).catch(() => {});
+      }
+      load();
+      const unsub = subscribeToTable('student_progress', load);
+      return () => { unsub(); };
     }
   }, [student]);
 
@@ -102,10 +107,10 @@ function AppContent() {
           if (view.mode === 'review' && view.reviewId) {
             const partNumber = reviewPondasiModules.find((m) => m.id === view.reviewId)?.parts.findIndex((p) => p.id === partId);
             if (partNumber !== undefined && partNumber >= 0) {
-              questions = await fetchReviewQuestions(view.reviewId, partNumber + 1);
+              questions = await fetchReviewQuestions(view.reviewId, partNumber + 1, student!.classLevel);
             }
           } else if (view.mode === 'quiz' && view.moduleId) {
-            questions = await fetchQuizQuestions(view.moduleId);
+            questions = await fetchQuizQuestions(view.moduleId, student!.classLevel);
           }
           const timerConfig = getTimerConfig(view.mode, view.moduleId);
           setView({ name: 'quiz', mode: view.mode, reviewId: view.reviewId, moduleId: view.moduleId, partId, questions, timerConfig });
@@ -147,10 +152,10 @@ function AppContent() {
           if (view.mode === 'review' && view.reviewId) {
             const partNumber = reviewPondasiModules.find((m) => m.id === view.reviewId)?.parts.findIndex((p) => p.id === view.partId);
             if (partNumber !== undefined && partNumber >= 0) {
-              questions = await fetchReviewQuestions(view.reviewId, partNumber + 1);
+              questions = await fetchReviewQuestions(view.reviewId, partNumber + 1, student!.classLevel);
             }
           } else if (view.mode === 'quiz' && view.moduleId) {
-            questions = await fetchQuizQuestions(view.moduleId);
+            questions = await fetchQuizQuestions(view.moduleId, student!.classLevel);
           }
           const timerConfig = getTimerConfig(view.mode, view.moduleId);
           setView({ name: 'quiz', mode: view.mode, reviewId: view.reviewId, moduleId: view.moduleId, partId: view.partId, questions, timerConfig });

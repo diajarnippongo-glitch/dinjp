@@ -8,7 +8,7 @@ import {
   APP_NAME, getDailyMotivation, mogiShikenGrade,
 } from '@/data/appData';
 import {
-  fetchStudentProgress, fetchAllProfiles, fetchAllProgress, fetchAllBilling,
+  fetchStudentProgress, fetchAllProfiles, fetchAllProgress, fetchAllBilling, subscribeToTable,
 } from '@/lib/dataAccess';
 import type { ProgressRecord, BillingRecord, Student } from '@/types';
 import BurgerMenu, { type MenuView } from '@/components/BurgerMenu';
@@ -98,10 +98,12 @@ function StudentDashboard({
 
   useEffect(() => {
     if (!studentId) return;
-    fetchStudentProgress(studentId)
-      .then(setProgress)
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    function load() {
+      fetchStudentProgress(studentId).then(setProgress).catch(() => {}).finally(() => setLoading(false));
+    }
+    load();
+    const unsub = subscribeToTable('student_progress', load);
+    return () => { unsub(); };
   }, [studentId]);
 
   const classLabel = className.includes('N4') ? 'Kelas N4' : 'Kelas N3';
@@ -212,10 +214,17 @@ function TeacherDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([fetchAllProfiles(), fetchAllProgress(), fetchAllBilling()])
-      .then(([p, prog, b]) => { setProfiles(p); setProgress(prog); setBilling(b); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    function load() {
+      Promise.all([fetchAllProfiles(), fetchAllProgress(), fetchAllBilling()])
+        .then(([p, prog, b]) => { setProfiles(p); setProgress(prog); setBilling(b); })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    }
+    load();
+    const unsubProfiles = subscribeToTable('profiles', load);
+    const unsubProgress = subscribeToTable('student_progress', load);
+    const unsubBilling = subscribeToTable('billing', load);
+    return () => { unsubProfiles(); unsubProgress(); unsubBilling(); };
   }, []);
 
   const classStudents = profiles.filter((s) => s.classLevel === activeClass && s.role === 'student');
