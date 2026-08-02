@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   LogOut, ChevronRight, TrendingUp, Target, Award,
-  Menu, Sparkles, Brain, BarChart3,
+  Menu, Sparkles, Brain, BarChart3, AlertCircle,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -95,15 +95,36 @@ function StudentDashboard({
   const motivation = getDailyMotivation();
   const [progress, setProgress] = useState<ProgressRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!studentId) return;
+    if (!studentId) {
+      console.warn('[StudentDashboard] No studentId, skipping progress fetch');
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
     function load() {
-      fetchStudentProgress(studentId).then(setProgress).catch(() => {}).finally(() => setLoading(false));
+      console.log('[StudentDashboard] Fetching progress for studentId:', studentId);
+      fetchStudentProgress(studentId)
+        .then((data) => {
+          if (cancelled) return;
+          console.log('[StudentDashboard] Received', data.length, 'progress records');
+          setProgress(data);
+          setError(null);
+        })
+        .catch((err) => {
+          if (cancelled) return;
+          console.error('[StudentDashboard] Failed to fetch progress:', err);
+          setError('Gagal memuat data progres. Coba muat ulang halaman.');
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
     }
     load();
     const unsub = subscribeToTable('student_progress', load);
-    return () => { unsub(); };
+    return () => { cancelled = true; unsub(); };
   }, [studentId]);
 
   const classLabel = className.includes('N4') ? 'Kelas N4' : 'Kelas N3';
@@ -142,6 +163,13 @@ function StudentDashboard({
         <p className="text-xs text-slate-400 mt-0.5">Halo, {studentName.split(' ')[0]}!</p>
         <p className="text-sm text-slate-300 mt-2 italic leading-relaxed">{motivation.quote}</p>
       </div>
+
+      {error && (
+        <div className="mb-6 flex items-center gap-2 p-4 rounded-xl bg-red-950/60 border border-red-800 text-red-300 text-sm">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3 mb-8">
         <button onClick={onOpenReview} className="flex items-center gap-3 p-5 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-red-500/50 hover:shadow-lg hover:shadow-red-900/20 transition text-left group">

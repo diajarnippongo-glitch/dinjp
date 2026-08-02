@@ -101,13 +101,24 @@ export async function fetchReviewQuestions(categoryId: string, partNumber: numbe
 }
 
 export async function fetchStudentProgress(userId: string): Promise<ProgressRecord[]> {
+  if (!userId) {
+    console.warn('[fetchStudentProgress] userId is empty, returning []');
+    return [];
+  }
   const { data, error } = await supabase
     .from('student_progress')
     .select('*')
     .eq('user_id', userId)
     .order('completed_at', { ascending: false });
-  if (error) throw error;
-  return (data ?? []).map((p: Record<string, unknown>) => ({
+  if (error) {
+    console.error('[fetchStudentProgress] Supabase error for user_id:', userId, error);
+    throw error;
+  }
+  if (!data || data.length === 0) {
+    console.log('[fetchStudentProgress] No progress records found for user_id:', userId);
+    return [];
+  }
+  return data.map((p: Record<string, unknown>) => ({
     id: p.id as string,
     userId: p.user_id as string,
     mode: p.mode as 'review' | 'quiz',
@@ -126,7 +137,10 @@ export async function fetchAllProgress(): Promise<ProgressRecord[]> {
     .from('student_progress')
     .select('*')
     .order('completed_at', { ascending: false });
-  if (error) throw error;
+  if (error) {
+    console.error('[fetchAllProgress] Supabase error:', error);
+    throw error;
+  }
   return (data ?? []).map((p: Record<string, unknown>) => ({
     id: p.id as string,
     userId: p.user_id as string,
@@ -142,6 +156,10 @@ export async function fetchAllProgress(): Promise<ProgressRecord[]> {
 }
 
 export async function saveProgress(record: Omit<ProgressRecord, 'id' | 'completedAt' | 'userId'>, userId: string): Promise<void> {
+  if (!userId) {
+    console.error('[saveProgress] userId is empty, cannot save progress');
+    throw new Error('User ID is required to save progress');
+  }
   const { error } = await supabase.from('student_progress').insert({
     user_id: userId,
     mode: record.mode,
@@ -152,7 +170,10 @@ export async function saveProgress(record: Omit<ProgressRecord, 'id' | 'complete
     total_questions: record.totalQuestions,
     passed: record.passed,
   });
-  if (error) throw error;
+  if (error) {
+    console.error('[saveProgress] Supabase error:', error);
+    throw error;
+  }
 }
 
 export async function fetchOwnBilling(studentName: string): Promise<BillingRecord[]> {

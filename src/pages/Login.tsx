@@ -14,11 +14,20 @@ export default function Login() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (!email || !email.trim() || !password) {
+      setError('Email dan password harus diisi');
+      return;
+    }
+
+    console.log('Attempting login for:', email);
     setLoading(true);
     try {
       await signIn(email, password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
+      const message = err instanceof Error ? err.message : 'Terjadi kesalahan saat masuk';
+      console.error('Login error:', message);
+      setError(message);
     } finally {
       setLoading(false);
     }
