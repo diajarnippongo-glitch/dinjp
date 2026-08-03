@@ -129,6 +129,12 @@ export const reviewPondasiModules: ReviewPondasiModule[] = [
   },
 ];
 
+export function getMondaiIdsForQuizPart(week: number, part: number): string[] {
+  const mondaiPerPart = 2;
+  const startMondai = (week - 1) * 2 + (part - 1) * mondaiPerPart;
+  return [`m${startMondai + 1}`, `m${startMondai + 2}`];
+}
+
 export const quizParts: QuizPartConfig[] = (() => {
   const parts: QuizPartConfig[] = [];
   for (let week = 1; week <= 12; week++) {

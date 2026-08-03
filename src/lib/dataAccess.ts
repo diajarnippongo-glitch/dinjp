@@ -73,17 +73,29 @@ function reviewRowToQuestion(row: RawReviewRow): QuizQuestion {
   };
 }
 
-export async function fetchQuizQuestions(moduleId: string, classLevel: 'N3' | 'N4' = 'N3'): Promise<QuizQuestion[]> {
+export async function fetchQuizQuestions(
+  moduleId: string,
+  classLevel: 'N3' | 'N4' = 'N3',
+  mondaiIds?: string[],
+): Promise<QuizQuestion[]> {
   const table = classLevel === 'N4' ? 'quiz_questions_n4' : 'quiz_questions_n3';
-  const { data, error } = await supabase
+  let query = supabase
     .from(table)
     .select('id, module_id, mondai_id, question_number, question, option_a, option_b, option_c, option_d, correct_option, audio_url, created_at')
     .eq('module_id', moduleId)
-    .order('question_number');
-  if (error) throw error;
+    .order('question_number', { ascending: true });
+
+  if (mondaiIds && mondaiIds.length > 0) {
+    query = query.in('mondai_id', mondaiIds);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error('[fetchQuizQuestions] Supabase error:', error);
+    throw error;
+  }
   if (!data || data.length === 0) return [];
-  const shuffled = shuffle(data as RawQuizRow[]);
-  return shuffled.map(rowToQuestion);
+  return (data as RawQuizRow[]).map(rowToQuestion);
 }
 
 export async function fetchReviewQuestions(categoryId: string, partNumber: number, classLevel: 'N3' | 'N4' = 'N3'): Promise<QuizQuestion[]> {

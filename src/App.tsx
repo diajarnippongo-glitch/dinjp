@@ -13,7 +13,7 @@ import TagihanSaya from '@/pages/TagihanSaya';
 import BurgerMenu, { type MenuView } from '@/components/BurgerMenu';
 import type { ModuleId, QuizQuestion, ReviewPondasiId, ProgressRecord, TimerConfig } from '@/types';
 import { REVIEW_TIMER, QUIZ_TIMERS } from '@/types';
-import { modules, reviewPondasiModules, quizParts } from '@/data/appData';
+import { modules, reviewPondasiModules, quizParts, getMondaiIdsForQuizPart } from '@/data/appData';
 import { fetchQuizQuestions, fetchReviewQuestions, fetchStudentProgress, saveProgress, subscribeToTable } from '@/lib/dataAccess';
 
 type View =
@@ -110,7 +110,9 @@ function AppContent() {
               questions = await fetchReviewQuestions(view.reviewId, partNumber + 1, student!.classLevel);
             }
           } else if (view.mode === 'quiz' && view.moduleId) {
-            questions = await fetchQuizQuestions(view.moduleId, student!.classLevel);
+            const part = quizParts.find((p) => p.id === partId);
+            const mondaiIds = part ? getMondaiIdsForQuizPart(part.week, part.part) : undefined;
+            questions = await fetchQuizQuestions(view.moduleId, student!.classLevel, mondaiIds);
           }
           const timerConfig = getTimerConfig(view.mode, view.moduleId);
           setView({ name: 'quiz', mode: view.mode, reviewId: view.reviewId, moduleId: view.moduleId, partId, questions, timerConfig });

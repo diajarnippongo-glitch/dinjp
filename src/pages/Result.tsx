@@ -111,11 +111,6 @@ export default function Result({ mode, reviewId, moduleId, partId, answers, ques
                     {isCorrect ? <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" /> : <XCircle className="w-4 h-4 text-red-500 shrink-0" />}
                     <span className="text-slate-300 font-medium">Soal {i + 1}</span>
                     <span className={`font-semibold ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>{isCorrect ? 'Benar' : 'Salah'}</span>
-                    {!isCorrect && (
-                      <span className="text-slate-500 text-xs truncate ml-auto">
-                        Jawaban benar: {q.options.find((o) => o.id === q.correctOptionId)?.label}
-                      </span>
-                    )}
                   </div>
                 );
               })}

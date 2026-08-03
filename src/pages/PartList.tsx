@@ -103,7 +103,7 @@ export default function PartList({ mode, reviewId, moduleId, onBack, onStart, pr
                               <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-red-950/40 text-red-300 border border-red-800/60">{part.label}</span>
                               {isPassed ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : isUnlocked ? <span className="text-xs text-red-400 font-medium">Tersedia</span> : <Lock className="w-4 h-4 text-slate-600" />}
                             </div>
-                            <p className="text-xs text-slate-400 mt-1">{quizMod.totalQuestions} soal · Nilai lulus {quizMod.passingScore}%</p>
+                            <p className="text-xs text-slate-400 mt-1">14 soal · Nilai lulus {quizMod.passingScore}%</p>
                             {isUnlocked && !isPassed && (
                               <div className="flex items-center gap-1 mt-3 text-red-400 text-xs font-semibold">Mulai <ChevronRight className="w-3.5 h-3.5" /></div>
                             )}
