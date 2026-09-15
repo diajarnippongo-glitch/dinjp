@@ -15,14 +15,14 @@ export default function TagihanSaya({ onBack }: TagihanSayaProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!student) return;
+    if (!student?.id) return;
     function load() {
-      fetchOwnBilling(student.name).then(setBilling).catch(() => {}).finally(() => setLoading(false));
+      fetchOwnBilling(student.id).then(setBilling).catch(() => {}).finally(() => setLoading(false));
     }
     load();
     const unsub = subscribeToTable('billing', load);
     return () => { unsub(); };
-  }, [student]);
+  }, [student?.id]);
 
   const lunasCount = billing.filter((b) => b.status === 'lunas').length;
   const belumCount = billing.filter((b) => b.status === 'belum').length;

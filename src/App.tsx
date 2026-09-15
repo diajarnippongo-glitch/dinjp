@@ -50,8 +50,13 @@ function AppContent() {
 
   if (!student) return <Login />;
 
-  function getTimerConfig(mode: 'review' | 'quiz', moduleId?: ModuleId): TimerConfig {
-    if (mode === 'review') return REVIEW_TIMER;
+  function getTimerConfig(mode: 'review' | 'quiz', moduleId?: ModuleId, partId?: string): TimerConfig {
+    if (mode === 'review') {
+      if (partId && partId.endsWith('-9')) {
+        return { durationSeconds: 30 * 60, label: '30 menit' };
+      }
+      return REVIEW_TIMER;
+    }
     if (moduleId) return QUIZ_TIMERS[student!.classLevel][moduleId];
     return REVIEW_TIMER;
   }
@@ -111,10 +116,12 @@ function AppContent() {
             }
           } else if (view.mode === 'quiz' && view.moduleId) {
             const part = quizParts.find((p) => p.id === partId);
-            const mondaiIds = part ? getMondaiIdsForQuizPart(part.week, part.part) : undefined;
+            const mondaiPerPart = (view.moduleId === 'goi' || view.moduleId === 'bunpou') ? 3
+              : (view.moduleId === 'dokkai' || view.moduleId === 'choukai') ? 5 : 2;
+            const mondaiIds = part ? getMondaiIdsForQuizPart(part.week, part.part, mondaiPerPart) : undefined;
             questions = await fetchQuizQuestions(view.moduleId, student!.classLevel, mondaiIds);
           }
-          const timerConfig = getTimerConfig(view.mode, view.moduleId);
+          const timerConfig = getTimerConfig(view.mode, view.moduleId, partId);
           setView({ name: 'quiz', mode: view.mode, reviewId: view.reviewId, moduleId: view.moduleId, partId, questions, timerConfig });
         }}
         progress={progress}
@@ -159,7 +166,7 @@ function AppContent() {
           } else if (view.mode === 'quiz' && view.moduleId) {
             questions = await fetchQuizQuestions(view.moduleId, student!.classLevel);
           }
-          const timerConfig = getTimerConfig(view.mode, view.moduleId);
+          const timerConfig = getTimerConfig(view.mode, view.moduleId, view.partId);
           setView({ name: 'quiz', mode: view.mode, reviewId: view.reviewId, moduleId: view.moduleId, partId: view.partId, questions, timerConfig });
         }}
         onHome={() => setView({ name: 'dashboard' })}

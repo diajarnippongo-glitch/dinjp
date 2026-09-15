@@ -32,8 +32,9 @@ export default function DataProgres({ onBack }: DataProgresProps) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {
+    setLoading(true);
     function load() {
-      Promise.all([fetchAllProfiles(), fetchAllProgress()])
+      Promise.all([fetchAllProfiles(), fetchAllProgress(activeClass)])
         .then(([p, prog]) => { setProfiles(p); setProgress(prog); })
         .catch(() => {})
         .finally(() => setLoading(false));
@@ -42,7 +43,7 @@ export default function DataProgres({ onBack }: DataProgresProps) {
     const unsubProfiles = subscribeToTable('profiles', load);
     const unsubProgress = subscribeToTable('student_progress', load);
     return () => { unsubProfiles(); unsubProgress(); };
-  }, []);
+  }, [activeClass]);
 
   const students = profiles.filter((s) => s.classLevel === activeClass && s.role === 'student');
   const gradeColors: Record<string, string> = { red: 'bg-red-950/60 text-red-300 border-red-800', amber: 'bg-amber-950/60 text-amber-300 border-amber-800', green: 'bg-green-950/60 text-green-300 border-green-800' };

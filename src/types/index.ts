@@ -20,6 +20,7 @@ export interface QuizQuestion {
   options: QuizOption[];
   correctOptionId: string;
   audioUrl?: string;
+  imageUrl?: string;
   mondaiId?: string;
 }
 
@@ -108,6 +109,7 @@ export interface ScheduleSession {
   time: string;
   subject: string;
   driveLink: string | null;
+  classCategory: string | null;
 }
 
 export interface TimerConfig {
@@ -124,15 +126,15 @@ export const QUIZ_TIMERS: Record<'N3' | 'N4', Record<ModuleId, TimerConfig>> = {
   N4: {
     moji: { durationSeconds: 10 * 60, label: '10 menit' },
     goi: { durationSeconds: 20 * 60, label: '20 menit' },
-    bunpou: { durationSeconds: 20 * 60, label: '20 menit' },
-    dokkai: { durationSeconds: 40 * 60, label: '40 menit' },
-    choukai: { durationSeconds: 40 * 60, label: '40 menit' },
+    bunpou: { durationSeconds: 25 * 60, label: '25 menit' },
+    dokkai: { durationSeconds: 45 * 60, label: '45 menit' },
+    choukai: { durationSeconds: 35 * 60, label: '35 menit' },
   },
   N3: {
     moji: { durationSeconds: 10 * 60, label: '10 menit' },
     goi: { durationSeconds: 25 * 60, label: '25 menit' },
     bunpou: { durationSeconds: 25 * 60, label: '25 menit' },
     dokkai: { durationSeconds: 45 * 60, label: '45 menit' },
-    choukai: { durationSeconds: 40 * 60, label: '40 menit' },
+    choukai: { durationSeconds: 35 * 60, label: '35 menit' },
   },
 };

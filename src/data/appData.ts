@@ -34,13 +34,13 @@ export const modules: LearningModule[] = [
   },
   {
     id: 'dokkai', title: 'Dokkai', titleJp: '読解', description: 'Pemahaman bacaan', icon: 'FileText',
-    totalQuestions: 18, passingScore: 85,
+    totalQuestions: 16, passingScore: 85,
     mondai: [
       { id: 'm1', label: '問題1', range: [1, 4] },
-      { id: 'm2', label: '問題2', range: [5, 7] },
-      { id: 'm3', label: '問題3', range: [8, 10] },
-      { id: 'm4', label: '問題4', range: [11, 15] },
-      { id: 'm5', label: '問題5', range: [16, 18] },
+      { id: 'm2', label: '問題2', range: [5, 7], scroll: true },
+      { id: 'm3', label: '問題3', range: [8, 10], scroll: true },
+      { id: 'm4', label: '問題4', range: [11, 14], scroll: true },
+      { id: 'm5', label: '問題5', range: [15, 16], scroll: true },
     ],
   },
   {
@@ -129,10 +129,17 @@ export const reviewPondasiModules: ReviewPondasiModule[] = [
   },
 ];
 
-export function getMondaiIdsForQuizPart(week: number, part: number): string[] {
-  const mondaiPerPart = 2;
+export const SCHEDULE_CATEGORIES_N4 = ['N4 土・日'];
+export const SCHEDULE_CATEGORIES_N3 = ['N3 月・水', 'N3 火・木', 'N3 金・土 / 日'];
+export const SCHEDULE_CATEGORIES_ALL = [...SCHEDULE_CATEGORIES_N4, ...SCHEDULE_CATEGORIES_N3];
+
+export function getScheduleCategories(classLevel: 'N3' | 'N4'): string[] {
+  return classLevel === 'N4' ? SCHEDULE_CATEGORIES_N4 : SCHEDULE_CATEGORIES_N3;
+}
+
+export function getMondaiIdsForQuizPart(week: number, part: number, mondaiPerPart = 2): string[] {
   const startMondai = (week - 1) * 2 + (part - 1) * mondaiPerPart;
-  return [`m${startMondai + 1}`, `m${startMondai + 2}`];
+  return Array.from({ length: mondaiPerPart }, (_, i) => `m${startMondai + i + 1}`);
 }
 
 export const quizParts: QuizPartConfig[] = (() => {

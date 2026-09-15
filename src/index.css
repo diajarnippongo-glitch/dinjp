@@ -2,29 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-/* BIZ UDMincho Medium — only applies to Japanese characters (Hiragana, Katakana, Kanji, CJK punctuation) */
-@font-face {
-  font-family: 'BIZ UDMincho';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('https://fonts.gstatic.com/s/bizudmincho/v1/EJRLRjR5Y4i5tSROVemjzWSL2ewLcw.woff2') format('woff2');
-  unicode-range: U+3040-309F, /* Hiragana */
-                U+30A0-30FF, /* Katakana */
-                U+3400-4DBF, /* CJK Unified Ideographs Extension A */
-                U+4E00-9FFF, /* CJK Unified Ideographs */
-                U+FF00-FFEF, /* Halfwidth and Fullwidth Forms */
-                U+3000-303F; /* CJK Symbols and Punctuation */
-}
-
-/* Global font stack: BIZ UDMincho is first, but unicode-range restricts it to Japanese chars only.
-   Latin/alphanumeric characters automatically fall through to the next font in the stack. */
+/* Global font stack: BIZ UDMincho for Japanese chars, system sans for Latin */
 :root {
-  font-family: 'BIZ UDMincho', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'BIZ UDMincho', 'Noto Serif JP', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* Japanese text utility — Mincho/Kyokashotai style for quiz questions, reading passages, and options */
 .jp-text {
-  font-family: 'BIZ UDMincho', 'Noto Sans JP', serif;
+  font-family: 'BIZ UDMincho', 'Noto Serif JP', serif;
+  font-feature-settings: "palt";
+}
+
+/* Furigana ruby text — authentic textbook style */
+.ruby-furigana rt {
+  font-family: 'BIZ UDMincho', 'Noto Serif JP', serif;
+  font-size: 0.5em;
+  font-weight: 400;
+  line-height: 1;
 }
 
 @keyframes sakura-fall {

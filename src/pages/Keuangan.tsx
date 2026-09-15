@@ -13,15 +13,16 @@ export default function Keuangan({ onBack }: KeuanganProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     function load() {
-      fetchAllBilling().then(setBilling).catch(() => {}).finally(() => setLoading(false));
+      fetchAllBilling(activeClass).then(setBilling).catch(() => {}).finally(() => setLoading(false));
     }
     load();
     const unsub = subscribeToTable('billing', load);
     return () => { unsub(); };
-  }, []);
+  }, [activeClass]);
 
-  const records = billing.filter((b) => b.classLevel === activeClass);
+  const records = billing;
   const lunasCount = records.filter((r) => r.status === 'lunas').length;
   const belumCount = records.filter((r) => r.status === 'belum').length;
   const totalOutstanding = records.filter((r) => r.status === 'belum').reduce((sum, r) => sum + r.amount, 0);
